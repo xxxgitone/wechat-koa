@@ -18,7 +18,10 @@
   },
   "homepage": "https://github.com/xxxgitone/wechat-koa#readme",
   "dependencies": {
+    "bluebird": "^3.5.0",
     "koa": "^2.2.0",
+    "raw-body": "^2.2.0",
+    "request": "^2.81.0",
     "sha1": "^1.1.1"
   }
 }
