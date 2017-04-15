@@ -1,14 +1,17 @@
 const sha1 = require('sha1');
 const getRawBody = require('raw-body');
 const Wechat = require('./wechat');
+const util = require('./util');
 
 
 //一个验证的中间件
 module.exports = function(opts) {
-    let wechat = new Wechat(opts);
+    // let wechat = new Wechat(opts);
 
     return function *(next) {
         console.log(this.query);
+
+        const that = this;
 
         const token = opts.token;
 
@@ -24,14 +27,14 @@ module.exports = function(opts) {
         // 将三个参数字符串拼接成一个字符串进行sha1加密
         const sha = sha1(str);
 
-        if (this.methods === 'GET') {
+        if (this.method === 'GET') {
             // 开发者获得加密后的字符串可与signature对比，标识该请求来源于微信
             if(sha === signature) {
                 this.body = echostr + '';
             } else {
                 this.body = 'wrong';
             }
-        } else if(this.methods === 'POST'){//用户发送过来的请求
+        } else if(this.method === 'POST'){//用户发送过来的请求
             if(sha !== signature) {
                 this.body = 'wrong';
                 return false;
@@ -44,7 +47,33 @@ module.exports = function(opts) {
                 encoding: this.charset
             });
 
-            console.log(data.toString());
+            //解析数据
+            const content = yield util.parseXMLAsync(data);
+
+            console.log(content);
+
+            //继续解析，可能为数组
+            const message = util.formatMessage(content.xml);
+
+            console.log(message);
+
+            if(message.MsgType === 'event') {
+                if(message.Event === 'subscribe') {
+                    const now = Date.now();
+
+                    that.status = 200;
+                    that.type = 'application/xml';
+                    that.body = '<xml>' +
+                                    '<ToUserName><![CDATA['+ message.FromUserName +']]></ToUserName>' +
+                                    '<FromUserName><![CDATA['+ message.ToUserName +']]></FromUserName>' +
+                                    '<CreateTime>'+ now +'</CreateTime>' +
+                                    '<MsgType><![CDATA[text]]></MsgType>' +
+                                    '<Content><![CDATA[hi, 欢迎关注]]></Content>' +
+                                '</xml>';
+                    
+                    return;
+                }
+            }
 
         }
     
