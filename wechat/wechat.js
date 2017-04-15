@@ -1,6 +1,7 @@
 
 const Promise = require('bluebird');
 const request = Promise.promisify(require('request'));
+const util = require('./util');
 
 const prefix = 'https://api.weixin.qq.com/cgi-bin/';
 const api = {
@@ -81,6 +82,21 @@ Wechat.prototype.updateAccessToken = function () {
         })
 
     })
+}
+
+Wechat.prototype.reply = function() {
+    console.log('body: ' + this.body);
+    const content = this.body;
+    const message = this.weixin;
+
+    console.log('wechat content: ' + content)
+
+
+    const xml = util.tpl(content, message);
+
+    this.status = 200;
+    this.type = 'application/xml';
+    this.body = xml;
 }
 
 

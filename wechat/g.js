@@ -5,8 +5,8 @@ const util = require('./util');
 
 
 //一个验证的中间件
-module.exports = function(opts) {
-    // let wechat = new Wechat(opts);
+module.exports = function(opts, handler) {
+    const wechat = new Wechat(opts);
 
     return function *(next) {
         console.log(this.query);
@@ -57,24 +57,13 @@ module.exports = function(opts) {
 
             console.log(message);
 
-            if(message.MsgType === 'event') {
-                if(message.Event === 'subscribe') {
-                    const now = Date.now();
+            this.weixin = message;
 
-                    that.status = 200;
-                    that.type = 'application/xml';
-                    that.body = '<xml>' +
-                                    '<ToUserName><![CDATA['+ message.FromUserName +']]></ToUserName>' +
-                                    '<FromUserName><![CDATA['+ message.ToUserName +']]></FromUserName>' +
-                                    '<CreateTime>'+ now +'</CreateTime>' +
-                                    '<MsgType><![CDATA[text]]></MsgType>' +
-                                    '<Content><![CDATA[hi, 欢迎关注]]></Content>' +
-                                '</xml>';
-                    
-                    return;
-                }
-            }
+            console.log('wixin ' + JSON.stringify(this.weixin));
 
+            yield handler.call(this, next); //handler为传入的wechat.reply
+
+            wechat.reply.call(this);
         }
     
     }
