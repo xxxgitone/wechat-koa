@@ -1,11 +1,13 @@
 
+const fs = require('fs');
 const Promise = require('bluebird');
 const request = Promise.promisify(require('request'));
 const util = require('./util');
 
 const prefix = 'https://api.weixin.qq.com/cgi-bin/';
 const api = {
-    accessToken: prefix + 'token?grant_type=client_credential'
+    accessToken: prefix + 'token?grant_type=client_credential',
+    upload: prefix + 'media/upload?'
 }
 
 //获取access_token，access_token是公众号的全局唯一接口调用凭据
@@ -17,6 +19,18 @@ function Wechat(opts) {
     this.getAccessToken = opts.getAccessToken;
     this.saveAccessToken = opts.saveAccessToken;
 
+    this.fetchAccessToken();
+    
+}
+
+Wechat.prototype.fetchAccessToken = function() {
+    const that = this;
+
+    if(this.access_token && this.expires_in) {
+        if(this.isValidAccessToken(this)) {
+            return Promise.resolve(this);
+        }
+    }
     this.getAccessToken()
         .then(function(data) {
             try {
@@ -41,6 +55,8 @@ function Wechat(opts) {
 
             //将票据存入
             that.saveAccessToken(data);
+
+            return Promise.resolve(data);
         })
 }
 
@@ -84,6 +100,40 @@ Wechat.prototype.updateAccessToken = function () {
     })
 }
 
+//上传文素材
+Wechat.prototype.uploadMaterial = function (type, filepath) {
+    const that = this;
+    const form = {
+        media: fs.createReadStream(filepath)
+    }
+
+    const appID = this.appID;
+    const appSecret = this.appSecret;
+
+    return new Promise(function(resolve, reject) {
+        that
+            .fetchAccessToken()
+            .then(function(data) {
+                const url = api.upload + 'access_token=' + data.access_token + '&type=' + type;
+
+                request({method: 'POST', url: url, formData: form, json: true}).then(function(response) {
+                    console.log('response' + JSON.stringify(response));
+                    let _data = response.body;
+                    console.log('_data' + JSON.stringify(_data));
+
+                    if(_data) {
+                        resolve(_data);
+                    } else {
+                        throw new Error('Upload material fails');
+                    }
+                })
+                .catch(function(err) {
+                    reject(err);
+                })
+            })
+    })
+}
+
 Wechat.prototype.reply = function() {
     console.log('body: ' + this.body);
     const content = this.body;
@@ -98,6 +148,8 @@ Wechat.prototype.reply = function() {
     this.type = 'application/xml';
     this.body = xml;
 }
+
+
 
 
 module.exports = Wechat;

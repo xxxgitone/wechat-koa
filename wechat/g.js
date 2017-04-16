@@ -61,7 +61,7 @@ module.exports = function(opts, handler) {
 
             console.log('wixin ' + JSON.stringify(this.weixin));
 
-            yield handler.call(this, next); //handler为传入的wechat.reply
+            yield handler.call(this, next); //weixn.reply
 
             wechat.reply.call(this);
         }

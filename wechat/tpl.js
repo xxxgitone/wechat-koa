@@ -13,15 +13,15 @@ const tpl = heredoc(function() {/*
             <Content><![CDATA[<%= content %>]]></Content>
         <% } else if (msgType === 'image') { %>
             <Image>
-                <MediaId><![CDATA[<%= content.media_id %>]]></MediaId>
+                <MediaId><![CDATA[<%= content.mediaId %>]]></MediaId>
             </Image>
         <% } else if (msgType === 'voice') { %>
             <Voice>
-                <MediaId><![CDATA[<%= content.media_id %>]]></MediaId>
+                <MediaId><![CDATA[<%= content.mediaId %>]]></MediaId>
             </Voice>
         <% } else if (msgType === 'video') { %>
             <Video>
-                <MediaId><![CDATA[<%= content.media_id %>]]></MediaId>
+                <MediaId><![CDATA[<%= content.mediaId %>]]></MediaId>
                 <Title><![CDATA[<%= content.title %>]]></Title>
                 <Description><![CDATA[<%= content.description %>]]></Description>
             </Video>
@@ -40,7 +40,7 @@ const tpl = heredoc(function() {/*
                     <item> 
                         <Title><![CDATA[<%= item.title %>]]></Title> 
                         <Description><![CDATA[<%= item.description1 %>]]></Description>
-                        <PicUrl><![CDATA[<%= item.picurl %>]]></PicUrl>
+                        <PicUrl><![CDATA[<%= item.picUrl %>]]></PicUrl>
                         <Url><![CDATA[<%= item.url %>]]></Url>
                     </item>
                 <% }) %>
