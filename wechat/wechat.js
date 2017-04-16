@@ -1,13 +1,21 @@
 
 const fs = require('fs');
 const Promise = require('bluebird');
+const _ = require('lodash');
 const request = Promise.promisify(require('request'));
 const util = require('./util');
 
 const prefix = 'https://api.weixin.qq.com/cgi-bin/';
 const api = {
     accessToken: prefix + 'token?grant_type=client_credential',
-    upload: prefix + 'media/upload?'
+    temporary: {
+        upload: prefix + 'media/upload?'
+    },
+    permanent: {
+        upload: prefix + 'material/add_material?',
+        uploadNews: prefix + 'material/add_news?',
+        uploadNewsPic: prefix + 'media/uploadimg?'
+    }
 }
 
 //获取access_token，access_token是公众号的全局唯一接口调用凭据
@@ -101,20 +109,60 @@ Wechat.prototype.updateAccessToken = function () {
 }
 
 //上传文素材
-Wechat.prototype.uploadMaterial = function (type, filepath) {
+Wechat.prototype.uploadMaterial = function (type, material, permanent) {
     const that = this;
-    const form = {
-        media: fs.createReadStream(filepath)
+    let form = {};
+    //默认为零时素材
+    let uploadUrl = api.temporary.upload;
+
+    // 如果传入了参数
+    if(permanent) {
+        uploadUrl = api.permanent.upload;
+
+        _.assign(form, permanent);
     }
 
-    const appID = this.appID;
-    const appSecret = this.appSecret;
+    if(type === 'pic') {
+        uploadUrl = api.permanent.uploadNewsPic;
+    }
+
+    if(type === 'news') {
+        uploadUrl = api.permanent.uploadNews;
+
+        //如果传入了一个数组
+        form = material;
+    } else {
+        // 如果传入了一个路径
+        form.media = fs.createReadStream(material);
+    }
+
+    // const appID = this.appID;
+    // const appSecret = this.appSecret;
 
     return new Promise(function(resolve, reject) {
         that
             .fetchAccessToken()
             .then(function(data) {
-                const url = api.upload + 'access_token=' + data.access_token + '&type=' + type;
+                let url = uploadUrl + 'access_token=' + data.access_token;
+
+                if(!permanent) {
+                    url += '&type=' + type;
+                } else {
+                    form.access_token = data.access_token;
+                }
+
+                let options = {
+                    method: 'POST',
+                    url: url,
+                    json: true
+                }
+
+                if(type === 'news') {
+                    options.body = form;
+                } else {
+                    options.formData = form;
+                }
+
 
                 request({method: 'POST', url: url, formData: form, json: true}).then(function(response) {
                     console.log('response' + JSON.stringify(response));

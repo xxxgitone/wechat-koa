@@ -76,6 +76,24 @@ exports.reply = function *(next) {
                 musicUrl: 'http://play.baidu.com/?__m=mboxCtrl.playSong&__a=540175998&__o=song/540175998||playBtn&fr=-1||-1#',
                 thumbMediaId: data.media_id
             }
+        } else if(content === '8') {//永久素材
+            const data = yield wechatApi.uploadMaterial('image', __dirname + '/2.jpg', {type: 'image'});
+
+            reply = {
+                type: 'image',
+                mediaId: data.media_id
+            }
+        } else if(content === '9') {
+            const data = yield wechatApi.uploadMaterial('video', __dirname + '/6.mp4', {type: 'video', description: '{"title": "nice", "introduction": "SO EASY"}'});
+
+            console.log(data);
+
+            reply = {
+                type: 'video',
+                title: '回复视频内容',
+                description: '瞎说',
+                mediaId: data.media_id
+            }
         }
 
         this.body = reply;
