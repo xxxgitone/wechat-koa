@@ -1,58 +1,54 @@
-const ejs = require('ejs');
-const heredoc = require('heredoc');
+const ejs = require('ejs')
+const heredoc = require('heredoc')
 
-//各种消息的模板
-const tpl = heredoc(function() {/*
-    <xml>
-        <ToUserName><![CDATA[<%= toUserName %>]]></ToUserName>
-        <FromUserName><![CDATA[<%= fromUserName %>]]></FromUserName>
-        <CreateTime><%= createTime %></CreateTime>
-        <MsgType><![CDATA[<%= msgType %>]]></MsgType>
+const tpl = heredoc(function () {/*
+  <xml>
+    <ToUserName><![CDATA[<%= ToUserName %>]]></ToUserName>
+    <FromUserName><![CDATA[<%= FromUserName %>]]></FromUserName>
+    <CreateTime><%= CreateTime %></CreateTime>
+    <MsgType><![CDATA[<%= MsgType %>]]></MsgType>
 
-        <% if (msgType === 'text') { %>
-            <Content><![CDATA[<%= content %>]]></Content>
-        <% } else if (msgType === 'image') { %>
-            <Image>
-                <MediaId><![CDATA[<%= content.mediaId %>]]></MediaId>
-            </Image>
-        <% } else if (msgType === 'voice') { %>
-            <Voice>
-                <MediaId><![CDATA[<%= content.mediaId %>]]></MediaId>
-            </Voice>
-        <% } else if (msgType === 'video') { %>
-            <Video>
-                <MediaId><![CDATA[<%= content.mediaId %>]]></MediaId>
-                <Title><![CDATA[<%= content.title %>]]></Title>
-                <Description><![CDATA[<%= content.description %>]]></Description>
-            </Video>
-        <% } else if (msgType === 'music') { %>
-            <Music>
-                <Title><![CDATA[<%= content.title %>]]></Title>
-                <Description><![CDATA[<%= content.description %>]]></Description>
-                <MusicUrl><![CDATA[<%= content.musicUrl %>]]></MusicUrl>
-                <HQMusicUrl><![CDATA[<%= content.hQMusicUrl %>]]></HQMusicUrl>
-                <ThumbMediaId><![CDATA[<%= content.thumbMediaId %>]]></ThumbMediaId>
-            </Music>
-        <% } else if (msgType === 'news') { %>
-            <ArticleCount><%= content.length %></ArticleCount>
-            <Articles>
-                <% content.forEach(function(item) { %>
-                    <item> 
-                        <Title><![CDATA[<%= item.title %>]]></Title> 
-                        <Description><![CDATA[<%= item.description1 %>]]></Description>
-                        <PicUrl><![CDATA[<%= item.picUrl %>]]></PicUrl>
-                        <Url><![CDATA[<%= item.url %>]]></Url>
-                    </item>
-                <% }) %>
-            </Articles>
-        <% } %>
-    </xml>
+    <% if (MsgType === 'text') { %>
+      <Content><![CDATA[<%= content %>]]></Content>
+    <% } else if (MsgType === 'image') {%>
+      <Image>
+        <MediaId><![CDATA[<%= content.Media_id %>]]></MediaId>
+      </Image>
+    <% } else if (MsgType === 'voice') {%>
+      <Voice>
+        <MediaId><![CDATA[<%= content.Media_id %>]></MediaId>
+      </Voice>
+    <% } else if (MsgType === 'video') {%>
+      <Video>
+        <MediaId><![CDATA[<%= content.Media_id %>]]></MediaId>
+        <Title><![CDATA[<%= content.Title %>]]></Title>
+        <Description><![CDATA[<%= content.Description %>]]></Description>
+      </Video> 
+    <% } else if (MsgType === 'music') {%>
+      <Music>
+        <Title><![CDATA[<%= content.Title %>]]></Title>
+        <Description><![CDATA[<%= content.Description %>]]></Description>
+        <MusicUrl><![CDATA[<%= content.Music_url %>]]></MusicUrl>
+        <HQMusicUrl><![CDATA[<%= content.HQ_MUSIC_Url %>]]></HQMusicUrl>
+        <ThumbMediaId><![CDATA[<%= content.Media_id %>]]]></ThumbMediaId>
+      </Music>
+    <% } else if (MsgType === 'news') {%>
+      <ArticleCount><%= content.length %></ArticleCount>
+      <Articles>
+        <% content.forEach(function(item) {%>
+        <item>
+          <Title><![CDATA[<%= item.Title %>]]></Title> 
+          <Description><![CDATA[<%= item.Description %>]]></Description>
+          <PicUrl><![CDATA[<%= item.PicUrl %>]]></PicUrl>
+          <Url><![CDATA[<%= item.Url %>]]></Url>
+        </item>
+        <% }) %>
+      </Articles>
+    <% } %>
+  </xml>
 */})
 
-const compiled = ejs.compile(tpl);
-
+const compiled = ejs.compile(tpl)
 exports = module.exports = {
-    compiled: compiled
+  compiled: compiled
 }
-
-
